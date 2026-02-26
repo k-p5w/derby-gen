@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="{{.TotalWidth}}" height="540" viewBox="0 0 {{.TotalWidth}} 540" xmlns="http://www.w3.org/2000/svg">
+  <rect width="{{.TotalWidth}}" height="540" fill="white" stroke="black" stroke-width="2"/>
+  
+  <g>
+    <rect x="0" y="0" width="48" height="540" fill="#333333" stroke="black"/>
+    <text x="24" y="270" font-size="{{.TitleFontSize}}" fill="white" style="writing-mode:vertical-rl;text-anchor:middle;font-weight:bold">{{.RaceName}}</text>
+  </g>
+
+  {{range .Horses}}
+  <g id="h{{.HorseNum}}">
+    <rect x="{{.PosX}}" y="0" width="48" height="540" fill="none" stroke="black"/>
+    <rect x="{{.PosX}}" y="0" width="48" height="30" fill="{{.GateColor}}" stroke="black"/>
+    <text x="{{.TextX}}" y="22" font-size="14" text-anchor="middle" font-weight="bold" fill="{{.TextColor}}">{{.GateNum}}</text>
+    
+    <rect x="{{.PosX}}" y="30" width="48" height="40" fill="#f0f0f0" stroke="black"/>
+    <text x="{{.TextX}}" y="58" font-size="22" text-anchor="middle" font-weight="bold">{{.HorseNum}}</text>
+    
+    <text x="{{.TextX}}" y="90" font-size="22" style="writing-mode:vertical-rl;text-anchor:start;font-weight:bold">{{.Name}}</text>
+    
+    <rect x="{{.PosX}}" y="400" width="48" height="140" fill="#fafafa" stroke="black"/>
+    {{range .Lines}}
+    <line x1="{{$.PosX}}" y1="{{.}}" x2="{{add $.PosX 48}}" y2="{{.}}" stroke="#ccc" stroke-dasharray="2 2" />
+    {{end}}
+  </g>
+  {{end}}
+</svg>
