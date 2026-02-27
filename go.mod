@@ -1,4 +1,4 @@
-module github.com/user/derby-gen
+module github.com/k-p5w/derby-gen
 
 go 1.25.5
 
