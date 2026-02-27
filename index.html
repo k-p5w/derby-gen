@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>馬柱生成プレビュー</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f0f0f0; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .preview-area { margin-top: 20px; overflow-x: auto; border: 1px solid #eee; padding: 10px; background: #fff; }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #218838; }
+        .hint { font-size: 0.85em; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🐎 馬柱生成シミュレーター</h2>
+    
+    <div class="form-group">
+        <label for="raceName">レース名</label>
+        <input type="text" id="raceName" value="ごはんのおとも選手権【GII】">
+    </div>
+
+    <div class="form-group">
+        <label for="horseNames">馬名（1行に1頭ずつ入力）</label>
+        <textarea id="horseNames" rows="10">生卵
+納豆
+明太子
+鮭フレーク
+海苔
+梅干
+塩辛
+キムチ</textarea>
+    </div>
+
+    <div class="form-group">
+        <label>
+            <input type="checkbox" id="useBg" checked> 背景色モードを有効にする
+        </label>
+    </div>
+
+    <button onclick="updatePreview()">馬柱を生成する</button>
+
+    <div class="preview-area">
+        <p>【プレビュー】</p>
+        <div id="svgContainer">
+            </div>
+    </div>
+    
+    <div class="form-group" style="margin-top: 20px;">
+        <label>生成用URL:</label>
+        <input type="text" id="generatedUrl" readonly onclick="this.select()">
+    </div>
+</div>
+
+<script>
+    function updatePreview() {
+        const raceName = document.getElementById('raceName').value;
+        const horseLines = document.getElementById('horseNames').value.split('\n').filter(n => n.trim() !== '');
+        const useBg = document.getElementById('useBg').checked ? '1' : '0';
+
+        // クエリパラメータの組み立て
+        const params = new URLSearchParams();
+        params.append('r', raceName);
+        horseLines.forEach(name => params.append('n', name));
+        params.append('bg', useBg);
+
+        // サーバーのハンドラーURL（環境に合わせて書き換えてください）
+        // 例: Goのサーバーが localhost:8080 で動いている場合
+        const baseUrl = 'http://localhost:3000/api/handler'; 
+        const finalUrl = `${baseUrl}?${params.toString()}`;
+
+        // URL表示と画像更新
+        document.getElementById('generatedUrl').value = window.location.origin + finalUrl;
+        document.getElementById('svgContainer').innerHTML = `<img src="${finalUrl}" alt="馬柱">`;
+    }
+
+    // 初回表示
+    window.onload = updatePreview;
+</script>
+
+</body>
+</html>
