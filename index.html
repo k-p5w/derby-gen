@@ -1,88 +1,355 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>馬柱生成プレビュー</title>
+    <title>馬柱ジェネレーター Pro</title>
     <style>
-        body { font-family: sans-serif; margin: 20px; background-color: #f0f0f0; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input[type="text"], textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .preview-area { margin-top: 20px; overflow-x: auto; border: 1px solid #eee; padding: 10px; background: #fff; }
-        button { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #218838; }
-        .hint { font-size: 0.85em; color: #666; }
+        :root {
+            --primary-color: #28a745;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --border-color: #ced4da;
+            --muted-color: #6c757d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-color);
+            margin: 0;
+            padding: 15px;
+            color: var(--text-main);
+        }
+
+        .card {
+            background: var(--card-bg);
+            max-width: 600px;
+            margin: auto;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            text-align: center;
+            margin-top: 0;
+            color: var(--text-main);
+            font-size: 1.5rem;
+        }
+
+        .field-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .input-text {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 16px;
+        }
+
+        /* モード切替タブ */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 5px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+            font-size: 0.85em;
+            color: #495057;
+            line-height: 1.4;
+        }
+
+        .tab.active {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: var(--primary-color);
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        /* 入力エリア */
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        .horse-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .gate-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            border: 1px solid #adb5bd;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .single-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        /* ボタン */
+        .action-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-gen {
+            flex: 3;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-gen:active {
+            transform: scale(0.98);
+            background: #218838;
+        }
+
+        .btn-reset {
+            flex: 1;
+            background: #6c757d;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        /* プレビュー */
+        #preview {
+            margin-top: 25px;
+            text-align: center;
+            overflow-x: auto;
+            border-top: 2px dashed #eee;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        #preview img {
+            max-width: 100%;
+            border: 2px solid #343a40;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-hint {
+            font-size: 0.8em;
+            color: var(--muted-color);
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        /* フッター */
+        footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: var(--muted-color);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer .copyright {
+            margin-top: 15px;
+            font-size: 11px;
+            opacity: 0.6;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h2>🐎 馬柱生成シミュレーター</h2>
-    
-    <div class="form-group">
-        <label for="raceName">レース名</label>
-        <input type="text" id="raceName" value="ごはんのおとも選手権【GII】">
-    </div>
+    <div class="card">
+        <h3>🐎 馬柱ジェネレーター</h3>
 
-    <div class="form-group">
-        <label for="horseNames">馬名（1行に1頭ずつ入力）</label>
-        <textarea id="horseNames" rows="10">生卵
-納豆
-明太子
-鮭フレーク
-海苔
-梅干
-塩辛
-キムチ</textarea>
-    </div>
+        <div class="field-group">
+            <label>レース名</label>
+            <input type="text" id="raceName" class="input-text" placeholder="例：有馬記念">
+        </div>
 
-    <div class="form-group">
-        <label>
-            <input type="checkbox" id="useBg" checked> 背景色モードを有効にする
-        </label>
-    </div>
+        <div class="tabs">
+            <div id="tabMulti" class="tab active" onclick="switchMode('multi')">一括入力<br><span
+                    style="font-size:0.8em; font-weight:normal;">(コピペに便利)</span></div>
+            <div id="tabSingle" class="tab" onclick="switchMode('single')">1行ずつ入力<br><span
+                    style="font-size:0.8em; font-weight:normal;">(スマホで修正)</span></div>
+        </div>
 
-    <button onclick="updatePreview()">馬柱を生成する</button>
+        <div id="multiContent" class="content active">
+            <textarea id="multiInput" oninput="syncToSingle()" placeholder="ここに馬名を1行ずつ入力してください"></textarea>
+        </div>
 
-    <div class="preview-area">
-        <p>【プレビュー】</p>
-        <div id="svgContainer">
+        <div id="singleContent" class="content">
+            <div id="horseContainer"></div>
+        </div>
+
+        <div class="action-area">
+            <button class="btn btn-gen" onclick="generate()">馬柱を生成する</button>
+            <button class="btn btn-reset" onclick="resetForm()">リセット</button>
+        </div>
+
+        <div id="preview">
+            <div class="preview-hint" id="previewHint">↓ 画像を長押し/右クリックで保存</div>
+            <div id="imageResult"></div>
+        </div>
+
+        <footer>
+            <div style="font-weight: bold; margin-bottom: 8px;">Contact &amp; Information</div>
+            <p style="margin: 0; line-height: 1.6;">画像が表示されない等の報告はこちら：<br>
+                <a href="https://discord.gg/6wzPRYWx9f" target="_blank">Support &amp; Community (Discord)</a>
+            </p>
+            <div class="copyright">
+                © 2026 derby-gen<br>
+                DESIGN IN ME / MADE IN AI
             </div>
+        </footer>
     </div>
-    
-    <div class="form-group" style="margin-top: 20px;">
-        <label>生成用URL:</label>
-        <input type="text" id="generatedUrl" readonly onclick="this.select()">
-    </div>
-</div>
 
-<script>
-    function updatePreview() {
-        const raceName = document.getElementById('raceName').value;
-        const horseLines = document.getElementById('horseNames').value.split('\n').filter(n => n.trim() !== '');
-        const useBg = document.getElementById('useBg').checked ? '1' : '0';
+    <script>
+        const gateColors = ["#FFFFFF", "#000000", "#FF0000", "#0000FF", "#FFFF00", "#00FF00", "#FFA500", "#FFC0CB"];
+        const textColors = ["black", "white", "white", "white", "black", "black", "black", "black"];
 
-        // クエリパラメータの組み立て
-        const params = new URLSearchParams();
-        params.append('r', raceName);
-        horseLines.forEach(name => params.append('n', name));
-        params.append('bg', useBg);
+        function switchMode(mode) {
+            document.getElementById('tabMulti').classList.toggle('active', mode === 'multi');
+            document.getElementById('tabSingle').classList.toggle('active', mode === 'single');
+            document.getElementById('multiContent').classList.toggle('active', mode === 'multi');
+            document.getElementById('singleContent').classList.toggle('active', mode === 'single');
+            if (mode === 'single') syncToSingle();
+        }
 
-        // サーバーのハンドラーURL（環境に合わせて書き換えてください）
-        // 例: Goのサーバーが localhost:8080 で動いている場合
-        const baseUrl = 'http://localhost:3000/api/handler'; 
-        const finalUrl = `${baseUrl}?${params.toString()}`;
+        function syncToSingle() {
+            const text = document.getElementById('multiInput').value;
+            const names = text.split('\n').map(n => n.trim()).filter(n => n !== '');
+            const displayCount = Math.max(names.length, 1);
+            const container = document.getElementById('horseContainer');
+            container.innerHTML = '';
 
-        // URL表示と画像更新
-        document.getElementById('generatedUrl').value = window.location.origin + finalUrl;
-        document.getElementById('svgContainer').innerHTML = `<img src="${finalUrl}" alt="馬柱">`;
-    }
+            let gateCounts = new Array(8).fill(0);
+            for (let i = 0; i < displayCount; i++) {
+                if (i < 8) gateCounts[i] = 1;
+                else gateCounts[7 - ((i - 8) % 8)]++;
+            }
 
-    // 初回表示
-    window.onload = updatePreview;
-</script>
+            let horseIdx = 0;
+            for (let gIdx = 0; gIdx < 8; gIdx++) {
+                for (let hInGate = 0; hInGate < gateCounts[gIdx]; hInGate++) {
+                    if (horseIdx >= displayCount) break;
+                    const row = document.createElement('div');
+                    row.className = 'horse-row';
+                    const nameVal = names[horseIdx] || '';
+                    row.innerHTML = `
+                        <div class="gate-badge" style="background:${gateColors[gIdx]}; color:${textColors[gIdx]}">${gIdx + 1}</div>
+                        <input type="text" class="single-input" value="${nameVal}" placeholder="${horseIdx + 1}番目の馬名" oninput="syncToMulti()">
+                    `;
+                    container.appendChild(row);
+                    horseIdx++;
+                }
+            }
+        }
 
+        function syncToMulti() {
+            const inputs = document.querySelectorAll('.single-input');
+            const names = Array.from(inputs).map(i => i.value).filter(v => v !== '');
+            document.getElementById('multiInput').value = names.join('\n');
+        }
+
+        function resetForm() {
+            if (confirm('入力内容をすべて消去しますか？')) {
+                document.getElementById('raceName').value = '';
+                document.getElementById('multiInput').value = '';
+                document.getElementById('imageResult').innerHTML = '';
+                document.getElementById('previewHint').style.display = 'none';
+                syncToSingle();
+            }
+        }
+
+        function generate() {
+            const race = document.getElementById('raceName').value || '無題のレース';
+            const names = document.getElementById('multiInput').value.split('\n').filter(n => n.trim() !== '');
+            if (names.length === 0) {
+                alert('馬名を入力してください');
+                return;
+            }
+            const params = new URLSearchParams();
+            params.append('r', race);
+            names.forEach(n => params.append('n', n));
+            params.append('bg', '1');
+
+            // 修正ポイント：URLの組み立てを /api?キー=値 に統一
+            // ローカル環境(localhost:3000)でも本番URLでもどちらでも動くように相対パスにしています
+            const url = `/api?${params.toString()}`;
+            
+            document.getElementById('previewHint').style.display = 'block';
+            document.getElementById('imageResult').innerHTML = `<img src="${url}" alt="馬柱">`;
+        }
+
+        window.onload = () => {
+            document.getElementById('raceName').value = "ごはんのおとも選手権【GII】";
+            document.getElementById('multiInput').value = "生卵\n納豆\n明太子\n鮭フレーク\n海苔\n梅干\n塩辛\nキムチ";
+            syncToSingle();
+        };
+    </script>
 </body>
+
 </html>

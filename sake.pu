@@ -1,0 +1,129 @@
+@startuml sake_alc
+
+' 全体のレイアウト調整
+skinparam ranksep 15
+skinparam nodesep 40
+skinparam dpi 150
+skinparam arrowThickness 0.8
+
+title 日本酒製造工程（醸造アルコール添加あり）
+
+package "仕込み" {
+    (酒母) -> (醪)
+    note right of (醪)
+      ここで発酵が進む
+    end note
+}
+
+' 運命の分岐点
+(醪) -> (醸造アルコール添加) #pink
+note top of (醸造アルコール添加)
+  **ここがポイント！**
+  絞る直前に添加することで
+  香りを引き出し、味をスッキリさせる
+end note
+
+(醸造アルコール添加) -> (上槽) : 絞り
+
+package "仕上げ" {
+    (上槽) -> (滓引・濾過)
+    (滓引・濾過) -> (火入れ1)
+    (火入れ1) -> (貯蔵)
+}
+
+' 分類メモ
+(醸造アルコール添加) .[#gray].> saletype
+
+note as Classification
+  **【特定名称酒の基準】**
+  * 精米歩合 60%以下 → 吟醸
+  * 精米歩合 50%以下 → 大吟醸
+  * 醸造アルコール無 → 純米
+end note
+
+
+@enduml
+
+@startuml sakeORIGIN
+
+' モノクロにする
+' skinparam monochrome true
+' 間隔
+skinparam ranksep 5
+' サイズ
+skinparam dpi 150
+' 矢印の太さ
+skinparam arrowThickness 0.5
+skinparam packageTitleAlignment left
+skinparam usecaseBorderThickness 0.4
+skinparam defaultFontSize 10
+' 枠の太さ
+skinparam rectangleBorderThickness 2
+
+note as Classification
+  **【特定名称酒の基準】**
+  * 精米歩合 60%以下 → 吟醸
+  * 精米歩合 50%以下 → 大吟醸
+  * 醸造アルコール無 → 純米
+end note
+
+rectangle 麹つくりまで {
+    (洗米)
+    (浸漬)
+    (水切り)
+    (蒸きゅう)
+    (放冷)
+}
+
+rectangle 酒母・原酒つくりまで {
+    (麹)
+    (酵母)
+    (醪/もろみ) as 醪
+    (上槽)
+    (滓引)
+    (濾過)
+    (火入れ)
+    (割水)
+}
+(貯蔵)
+(火入れ2)
+(濾過2)
+(調合)
+(割水2)
+(瓶詰め)
+(日本酒)
+(日本酒／生酒) as 日本酒_生酒
+(日本酒／生原酒) as 日本酒_生原酒
+(日本酒／生貯蔵酒) as 日本酒_生貯蔵酒
+(日本酒／生詰め) as 日本酒_生詰め
+精米->洗米
+
+洗米-right->浸漬
+
+浸漬-right->水切り
+水切り-->蒸きゅう
+蒸きゅう-right->放冷
+放冷-->麹
+麹-right->酵母
+酵母-right->醪
+醪-down->上槽:醸造アルコールありの場合、このあたりで付与
+上槽-right->滓引
+滓引-->濾過
+濾過-left->火入れ
+濾過-->貯蔵 #line:red;line.bold; :赤文字_生酒or生貯蔵酒ルート
+火入れ-left->割水
+割水-->貯蔵
+貯蔵-->調合
+調合-->割水2
+割水2-->濾過2
+濾過2-->火入れ2:生貯蔵酒or日本酒ルート
+濾過2-->瓶詰め #line:blue;line.bold; :青文字_生詰め酒ルート
+火入れ2-->瓶詰め
+瓶詰め-->日本酒_生貯蔵酒 #line:red;line.bold; :完成
+瓶詰め-->日本酒_生詰め #line:blue;line.bold; :完成
+調合-->日本酒_生原酒:瓶詰めして、完成
+瓶詰め-->日本酒:完成
+貯蔵-->日本酒_生酒#line:red;line.bold;:瓶詰めして、完成
+
+
+@enduml
