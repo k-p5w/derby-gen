@@ -59,7 +59,6 @@
             font-size: 16px;
         }
 
-        /* モード切替タブ */
         .tabs {
             display: flex;
             margin-bottom: 20px;
@@ -95,7 +94,6 @@
             display: block;
         }
 
-        /* 入力エリア */
         textarea {
             width: 100%;
             padding: 12px;
@@ -135,7 +133,6 @@
             font-size: 16px;
         }
 
-        /* ボタン */
         .action-area {
             display: flex;
             gap: 10px;
@@ -170,7 +167,6 @@
             font-size: 0.9rem;
         }
 
-        /* プレビュー */
         #preview {
             margin-top: 25px;
             text-align: center;
@@ -193,7 +189,6 @@
             display: none;
         }
 
-        /* フッター */
         footer {
             margin-top: 30px;
             padding-top: 20px;
@@ -324,20 +319,22 @@
             }
         }
 
+        // ここが最新の完全版generate関数です
         function generate() {
             const race = document.getElementById('raceName').value || '無題のレース';
             const names = document.getElementById('multiInput').value.split('\n').filter(n => n.trim() !== '');
+            
             if (names.length === 0) {
                 alert('馬名を入力してください');
                 return;
             }
+
             const params = new URLSearchParams();
             params.append('r', race);
             names.forEach(n => params.append('n', n));
             params.append('bg', '1');
 
-            // 修正ポイント：URLの組み立てを /api?キー=値 に統一
-            // ローカル環境(localhost:3000)でも本番URLでもどちらでも動くように相対パスにしています
+            // Vercel環境に合わせて /api をエンドポイントにします
             const url = `/api?${params.toString()}`;
             
             document.getElementById('previewHint').style.display = 'block';
